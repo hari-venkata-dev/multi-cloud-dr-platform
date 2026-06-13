@@ -1,0 +1,41 @@
+services:
+  aws-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: aws-app
+    environment:
+      - CLOUD_PROVIDER=AWS
+    ports:
+      - "5001:5000"
+    networks:
+      - dr-network
+
+  azure-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: azure-app
+    environment:
+      - CLOUD_PROVIDER=AZURE
+    ports:
+      - "5002:5000"
+    networks:
+      - dr-network
+
+  failover-gateway:
+    build:
+      context: .
+      dockerfile: docker/GatewayDockerfile
+    container_name: failover-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - aws-app
+      - azure-app
+    networks:
+      - dr-network
+
+networks:
+  dr-network:
+    driver: bridge
