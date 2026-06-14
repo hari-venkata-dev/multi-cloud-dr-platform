@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-app
+  namespace: multi-cloud-dr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aws-app
+  template:
+    metadata:
+      labels:
+        app: aws-app
+    spec:
+      containers:
+        - name: aws-app
+          image: multi-cloud-dr-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: CLOUD_PROVIDER
+              value: "AWS"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aws-app
+  namespace: multi-cloud-dr
+spec:
+  selector:
+    app: aws-app
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP
